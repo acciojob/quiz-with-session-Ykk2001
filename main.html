@@ -1,17 +1,128 @@
 <!DOCTYPE html>
-
-<html>
-  <head>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-
-  <body>
-    <!-- do not change this code -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
     <h1>Quiz</h1>
+
     <div id="questions"></div>
     <button id="submit">Submit</button>
     <div id="score"></div>
 
-    <script type="text/javascript" src="./script.js"></script>
-  </body>
+    <script>
+        // Do not change code below this line
+const questions = [
+  {
+    question: "What is the capital of France?",
+    choices: ["Paris", "London", "Berlin", "Madrid"],
+    answer: "Paris",
+  },
+  {
+    question: "What is the highest mountain in the world?",
+    choices: ["Everest", "Kilimanjaro", "Denali", "Matterhorn"],
+    answer: "Everest",
+  },
+  {
+    question: "What is the largest country by area?",
+    choices: ["Russia", "China", "Canada", "United States"],
+    answer: "Russia",
+  },
+  {
+    question: "Which is the largest planet in our solar system?",
+    choices: ["Earth", "Jupiter", "Mars"],
+    answer: "Jupiter",
+  },
+  {
+    question: "What is the capital of Canada?",
+    choices: ["Toronto", "Montreal", "Vancouver", "Ottawa"],
+    answer: "Ottawa",
+  },
+];
+
+const questionsElement = document.getElementById("questions");
+const scoreElement = document.getElementById("score");
+const submitButton = document.getElementById("submit");
+
+// Retrieve previous progress (if any) from sessionStorage
+let userAnswers = JSON.parse(sessionStorage.getItem("progress")) || [];
+
+// Retrieve previous score (if any) from localStorage
+const lastScore = localStorage.getItem("score");
+if (lastScore !== null) {
+  scoreElement.textContent = `Your last score is ${lastScore} out of ${questions.length}.`;
+}
+
+// ----------------------
+// Render all questions
+// ----------------------
+function renderQuestions() {
+  questionsElement.innerHTML = ""; // clear old content
+
+  for (let i = 0; i < questions.length; i++) {
+    const question = questions[i];
+    const questionElement = document.createElement("div");
+
+    // question text
+    const questionText = document.createTextNode(question.question);
+    questionElement.appendChild(questionText);
+    questionElement.appendChild(document.createElement("br"));
+
+    // render choices
+    for (let j = 0; j < question.choices.length; j++) {
+      const choice = question.choices[j];
+      const choiceElement = document.createElement("input");
+      choiceElement.setAttribute("type", "radio");
+      choiceElement.setAttribute("name", `question-${i}`);
+      choiceElement.setAttribute("value", choice);
+
+      // restore from sessionStorage
+      if (userAnswers[i] === choice) {
+        choiceElement.checked = true;
+      }
+
+      // on selection → save progress
+      choiceElement.addEventListener("change", () => {
+        userAnswers[i] = choice;
+        sessionStorage.setItem("progress", JSON.stringify(userAnswers));
+      });
+
+      const choiceText = document.createTextNode(choice);
+      questionElement.appendChild(choiceElement);
+      questionElement.appendChild(choiceText);
+      questionElement.appendChild(document.createElement("br"));
+    }
+
+    questionsElement.appendChild(questionElement);
+    questionsElement.appendChild(document.createElement("hr"));
+  }
+}
+
+renderQuestions();
+
+// ----------------------
+// Handle submission
+// ----------------------
+submitButton.addEventListener("click", () => {
+  let score = 0;
+
+  for (let i = 0; i < questions.length; i++) {
+    if (userAnswers[i] === questions[i].answer) {
+      score++;
+    }
+  }
+
+  scoreElement.textContent = `Your score is ${score} out of ${questions.length}.`;
+
+  // Save score in localStorage
+  localStorage.setItem("score", score);
+
+  // Optional: clear progress after submit
+  // sessionStorage.removeItem("progress");
+});
+
+    </script>
+</body>
 </html>
