@@ -81,12 +81,20 @@ function renderQuestions() {
       // restore from sessionStorage
       if (userAnswers[i] === choice) {
         choiceElement.checked = true;
+        choiceElement.setAttribute("checked", "true");  // required for Cypress
       }
 
       // on selection → save progress
       choiceElement.addEventListener("change", () => {
         userAnswers[i] = choice;
         sessionStorage.setItem("progress", JSON.stringify(userAnswers));
+
+        // Ensure only one checked attribute exists per question
+        document
+          .querySelectorAll(`input[name="question-${i}"]`)
+          .forEach(r => r.removeAttribute("checked"));
+
+        choiceElement.setAttribute("checked", "true");
       });
 
       const choiceText = document.createTextNode(choice);
